@@ -3,8 +3,9 @@
 Simple API and command line tool to retrieve the result of SPARQL queries from a 
 Sesame repository.
 
-This is based on code written originally in 2013 and still uses the rather dated 
-Sesame libraries from back then.
+The tool can be used to retrieve large result sets without overwhelming the server by retrieving
+small batches of data (see option -b below) and allows to increase the maxmimum query timeout
+for queries over a large repository.
 
 ## Setup 
 
