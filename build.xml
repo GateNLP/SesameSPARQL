@@ -15,23 +15,6 @@
   <!-- Make environment variables available -->
   <property environment="env" />
 
-  <!-- If environment variable GATE_HOME is set, use it for
-       gate.home (unless it was already set in build.properties -->
-  <condition property="gate.home" value="${env.GATE_HOME}">
-    <isset property="env.GATE_HOME"/>
-  </condition>
-
-  <!-- If gate.home is not set from build.properties or the 
-       environment variable GATE_HOME, assume that this
-       plugin is in GATE Developer's plugin directory -->
-  <property name="gate.home" location="../.." />
-
-  <!-- location of GATE lib directory - should be inferred from gate.home -->
-  <property name="gate.lib" location="${gate.home}/lib" />
-
-  <!-- location of gate.jar - should be inferred from gate.home -->
-  <property name="gate.jar" location="${gate.home}/bin/gate.jar" />
-
   <!-- Source directory - contains the Java source files for this plugin -->
   <property name="src.dir" location="src" />
 
@@ -54,14 +37,7 @@
 
 
 
-  <!-- Classpath to compile - includes gate.jar, GATE/lib/*.jar and any local
-       library JAR files. -->
   <path id="compile.classpath">
-    <pathelement location="${gate.jar}" />
-    <fileset dir="${gate.lib}">
-      <include name="**/*.jar" />
-      <include name="**/*.zip" />
-    </fileset>
     <fileset dir="${lib.dir}" includes="**/*.jar" />
   </path>
   

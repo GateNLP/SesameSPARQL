@@ -1,7 +1,5 @@
 package gate.sesame_sparql;
 
-import gate.util.GateRuntimeException;
-
 import org.openrdf.model.Value;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
@@ -14,7 +12,7 @@ import org.openrdf.query.TupleQuery;
  * bindings, and provides special methods for queries where only one
  * column is retrieved. It also wraps most of the Sesame stuff to make
  * most standard usage scenarios easier and it converts all checked 
- * Sesame exceptions to GateRuntimeExceptions to make it easier to 
+ * Sesame exceptions to RuntimeExceptions to make it easier to 
  * use this from e.g. JAPE. Instances of this class are returned from
  * a SparqlEndpoint instance by using the factory method createTupleQuery.
  * <p>
@@ -51,7 +49,7 @@ public class TupleQueryProcessor {
       sesameTupleQuery = ep.getConnection().prepareTupleQuery(QueryLanguage.SPARQL,
           queryString);
     } catch (Exception e) {
-      throw new GateRuntimeException("Could not create SPARQL query for "
+      throw new RuntimeException("Could not create SPARQL query for "
           + endpoint + ":\n" + queryString + "\n", e);
     }
     queryState = QueryState.INITIALIZED;

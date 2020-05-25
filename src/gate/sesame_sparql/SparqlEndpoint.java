@@ -18,9 +18,6 @@
 
 package gate.sesame_sparql;
 
-import gate.util.GateRuntimeException;
-import gate.util.Strings;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -101,7 +98,7 @@ public class SparqlEndpoint {
     try {
       endpointurl = new java.net.URL(endpoint);
     } catch (MalformedURLException e1) {
-      throw new GateRuntimeException("Endpoint URL is malformed: "+endpoint,e1);
+      throw new RuntimeException("Endpoint URL is malformed: "+endpoint,e1);
     }
     
     repository = new HTTPRepository(endpoint);
@@ -110,7 +107,7 @@ public class SparqlEndpoint {
     if(userpass != null) {
       String[] userpassfields = userpass.split(":");
       if(userpassfields.length != 2) {
-        throw new GateRuntimeException("URL has login data but looks strange");
+        throw new RuntimeException("URL has login data but looks strange");
       } else {
         repository.setUsernameAndPassword("khresmoi","ontotext");
       }
@@ -118,14 +115,14 @@ public class SparqlEndpoint {
     try {
       repository.initialize();
     } catch (RepositoryException e) {
-      throw new GateRuntimeException("Could not initialize HTTPRepository "
+      throw new RuntimeException("Could not initialize HTTPRepository "
           + endpoint, e);
     }
 
     try {
       connection = repository.getConnection();
     } catch (RepositoryException e) {
-      throw new GateRuntimeException(
+      throw new RuntimeException(
           "Could not get Connection for " + endpoint, e);
     }
     factory = repository.getValueFactory();
@@ -145,7 +142,7 @@ public class SparqlEndpoint {
     try {
       connection.close();
     } catch (RepositoryException e) {
-      throw new GateRuntimeException("Could not close connection for "
+      throw new RuntimeException("Could not close connection for "
           + endpoint, e);
     }
   }
@@ -187,7 +184,7 @@ public class SparqlEndpoint {
       System.err.println("Max query time is "+query.getMaxQueryTime());
       System.err.println("Includeinferred is "+query.getIncludeInferred());
     } catch (Exception e) {
-      throw new GateRuntimeException("Could not create SPARQL query for "
+      throw new RuntimeException("Could not create SPARQL query for "
           + endpoint + ":\n" + queryString + "\n", e);
     }
     return query;
@@ -204,7 +201,7 @@ public class SparqlEndpoint {
     // TODO: make sure we close things before passing on an exception!!!
     
     //if(argv.length != 2) {
-    //  throw new GateRuntimeException("Need 2 parameters: endpointURL queryFileName");
+    //  throw new RuntimeException("Need 2 parameters: endpointURL queryFileName");
     //}
     
     Options options = new Options();
@@ -301,7 +298,7 @@ public class SparqlEndpoint {
     try {
       sparqlQuery = FileUtils.readFileToString(new File(queryFileName), "UTF-8");
     } catch (IOException e) {
-      throw new GateRuntimeException("Could not read SPARQL query from file "+queryFileName,e);
+      throw new RuntimeException("Could not read SPARQL query from file "+queryFileName,e);
     }
     SparqlEndpoint sq = new SparqlEndpoint(endpointURL);
 
@@ -349,7 +346,7 @@ public class SparqlEndpoint {
     try {
       query.evaluate(handler);
     } catch (Exception e) {
-      throw new GateRuntimeException("Could not evaluate query",e);
+      throw new RuntimeException("Could not evaluate query",e);
     } finally {
       this.close();
       if(ow != null) {
@@ -377,7 +374,7 @@ public class SparqlEndpoint {
         } catch (IOException ex) {
         }
         e.printStackTrace();
-        throw new GateRuntimeException("Exception when opening output file: "+outFileName,e);
+        throw new RuntimeException("Exception when opening output file: "+outFileName,e);
       }
     }
     return ow;
@@ -429,7 +426,7 @@ public class SparqlEndpoint {
         Matcher embeddedMatcher = embedded.matcher(valueString);
         if (errorOnInvalidStrings) {
           if (trailingNLMatcher.find() || embeddedMatcher.find()) {
-            throw new GateRuntimeException("Invalid string in row " + (rows+1)
+            throw new RuntimeException("Invalid string in row " + (rows+1)
                 + " column " + column + " value " + valueString);
           }
         } else {
@@ -449,7 +446,7 @@ public class SparqlEndpoint {
           ow.write(buf.toString());
         } catch (IOException e) {
           e.printStackTrace();
-          throw new GateRuntimeException("Error writing output", e);
+          throw new RuntimeException("Error writing output", e);
         }
       }
       rows++;
