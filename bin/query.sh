@@ -14,6 +14,6 @@ while [ -h "$PRG" ] ; do
 done
 SCRIPTDIR=`dirname "$PRG"`
 SCRIPTDIR=`cd "$SCRIPTDIR"; pwd -P`
-PLUGINDIR=`cd "$SCRIPTDIR"; cd ..; pwd -P`
+ROOTDIR=`cd "$SCRIPTDIR"; cd ..; pwd -P`
 
-java -Xmx2500M -cp $PLUGINDIR/'lib/*':$PLUGINDIR/SesameSPARQL.jar:$GATE_HOME/bin/gate.jar:$GATE_HOME/'lib/*' gate.sesame_sparql.SparqlEndpoint  "$@"
+java -Xmx2500M -cp $ROOTDIR/'lib/*':$ROOTDIR/target/gatetool-sesame-sparql-0.1-SNAPSHOT-jar-with-dependencies.jar gate.tool.sesame_sparql.SparqlEndpoint  "$@"

@@ -1,4 +1,4 @@
-package gate.sesame_sparql;
+package gate.tool.sesame_sparql;
 
 import org.openrdf.model.Value;
 import org.openrdf.query.QueryLanguage;

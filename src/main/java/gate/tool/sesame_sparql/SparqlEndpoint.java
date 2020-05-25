@@ -16,7 +16,7 @@
  * http://gate.ac.uk/cgi-bin/userguide/sec:creole-model:config
  */
 
-package gate.sesame_sparql;
+package gate.tool.sesame_sparql;
 
 import java.io.BufferedWriter;
 import java.io.File;
