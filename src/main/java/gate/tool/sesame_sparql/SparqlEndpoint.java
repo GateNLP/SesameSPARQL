@@ -52,6 +52,7 @@ import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.TupleQueryResultHandler;
 import org.openrdf.query.TupleQueryResultHandlerException;
+import org.openrdf.query.QueryResultHandlerException;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -403,7 +404,14 @@ public class SparqlEndpoint {
     public void setPrintHeaders(boolean v) {
       printHeaders = v;
     }
-    
+   
+    @Override
+    public void handleLinks(List<String> linkUrls) throws QueryResultHandlerException {
+    }
+
+    @Override 
+    public void handleBoolean(boolean value) throws QueryResultHandlerException {
+    } 
     
     @Override
     public void handleSolution(BindingSet bs)
