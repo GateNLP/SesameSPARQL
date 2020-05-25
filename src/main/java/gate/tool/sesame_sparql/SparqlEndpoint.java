@@ -208,7 +208,8 @@ public class SparqlEndpoint {
     options.addOption("h", false, "Show help information");
     //options.addOption("e", true, "What to do: one of 'query', 'ask', 'update', default is 'query'");
     options.addOption("i", true, "Query input file (required)");
-    options.addOption("o", true, "Outfile");
+    // TODO: disabled for now, we always output to stdout because this is the only way we can get column headers for now!
+    // options.addOption("o", true, "Outfile");
     options.addOption("b", true, "Batchsize for queries, default: retrieve all at once");
     options.addOption("u", true, "endpoint URL (required)");
     options.addOption("ii", true, "include inferred: true or false, default=true");
