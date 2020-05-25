@@ -13,3 +13,9 @@ There are many possible ways how this could get extended:
   a lightweight ontology provides could get implemented in a different plugin, or we 
   simply allow each plugin to use their own abstractions.
 
+
+## Setup
+
+For GATE version 8.5 or later, the `GATE_HOME` environment variable needs to point to a
+GATE binary distribution, a cloned repo installation does not work since it does not have
+a lib directory (the dependencies are all in the Maven cache directory)
