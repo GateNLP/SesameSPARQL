@@ -1,7 +1,7 @@
 /*
  *  EndpointSPARQLQuery.java
  *
- * Copyright (c) 2000-2012, The University of Sheffield.
+ * Copyright (c) 2013-2020, The University of Sheffield.
  *
  * This file is part of GATE (see http://gate.ac.uk/), and is free
  * software, licenced under the GNU Library General Public License,
@@ -25,15 +25,10 @@ import java.io.IOException;
 import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.print.attribute.IntegerSyntax;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
@@ -41,36 +36,25 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.io.FileUtils;
-import org.openrdf.http.client.HTTPClient;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
-import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.TupleQueryResultHandler;
 import org.openrdf.query.TupleQueryResultHandlerException;
 import org.openrdf.query.QueryResultHandlerException;
-import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.http.HTTPRepository;
-import org.openrdf.repository.manager.RemoteRepositoryManager;
-import org.openrdf.repository.manager.RepositoryInfo;
 
 import org.apache.commons.io.FileUtils;
 
 /**
- * Simple class to handle SPARQL queries against a HTTP SPARQL endpoint. This is not
- * associated with any GATE resource but can be used as a library to call from
- * e.g. JAPE and also has a static main method that is used for the command line
- * shellscript in ./bin
- * <p>
- * Class usage: create instance passing the endpoint URL instance or String, get
- * connection etc. using the apropriate methods, when done call the close()
- * method.
+ * Simple class to handle SPARQL queries against a HTTP SPARQL endpoint. 
+ * 
+ * 
  */
 public class SparqlEndpoint {
 
@@ -110,7 +94,7 @@ public class SparqlEndpoint {
       if(userpassfields.length != 2) {
         throw new RuntimeException("URL has login data but looks strange");
       } else {
-        repository.setUsernameAndPassword("khresmoi","ontotext");
+        repository.setUsernameAndPassword(userpassfields[0],userpassfields[1]);
       }
     }    
     try {
