@@ -16,4 +16,4 @@ SCRIPTDIR=`dirname "$PRG"`
 SCRIPTDIR=`cd "$SCRIPTDIR"; pwd -P`
 ROOTDIR=`cd "$SCRIPTDIR"; cd ..; pwd -P`
 
-java -Xmx2500M -cp $ROOTDIR/'lib/*':$ROOTDIR/target/gatetool-sesame-sparql-0.1-SNAPSHOT-jar-with-dependencies.jar gate.tool.sesame_sparql.SparqlEndpoint  "$@"
+java $JAVA_OPTS -cp $ROOTDIR/'lib/*':$ROOTDIR/target/gatetool-sesame-sparql-0.1-SNAPSHOT-jar-with-dependencies.jar gate.tool.sesame_sparql.SparqlEndpoint  "$@"

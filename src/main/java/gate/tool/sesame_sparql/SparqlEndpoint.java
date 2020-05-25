@@ -20,11 +20,17 @@ package gate.tool.sesame_sparql;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,7 +50,8 @@ import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResultHandler;
 import org.openrdf.query.TupleQueryResultHandlerException;
-import org.openrdf.query.QueryResultHandlerException;
+// TODO: needed for later Sesame versions
+//import org.openrdf.query.QueryResultHandlerException;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.http.HTTPRepository;
@@ -191,12 +198,12 @@ public class SparqlEndpoint {
     
     Options options = new Options();
     options.addOption("h", false, "Show help information");
+    // TODO: not implemented yet
     //options.addOption("e", true, "What to do: one of 'query', 'ask', 'update', default is 'query'");
     options.addOption("i", true, "Query input file (required)");
-    // TODO: disabled for now, we always output to stdout because this is the only way we can get column headers for now!
-    // options.addOption("o", true, "Outfile");
+    options.addOption("o", true, "Outfile");
     options.addOption("b", true, "Batchsize for queries, default: retrieve all at once");
-    options.addOption("u", true, "endpoint URL (required)");
+    options.addOption("u", true, "endpoint URL, can include user:password@ prefix (required)");
     options.addOption("ii", true, "include inferred: true or false, default=true");
     options.addOption("mt", true, "maximum query time in seconds, default=3600");
     options.addOption("ph", true, "print headers: true or false, default=false");
@@ -207,7 +214,7 @@ public class SparqlEndpoint {
     try {
       cmd = parser.parse( options, argv);
     } catch (ParseException e1) {
-      System.err.println("Could not parse arguments: "+argv);
+      System.err.println("Could not parse arguments: "+Arrays.toString(argv));
       e1.printStackTrace(System.err);
       System.exit(1);
     }
@@ -277,8 +284,20 @@ public class SparqlEndpoint {
     
     
     String outFileName = cmd.getOptionValue('o');
+    PrintStream outps = null;
+    try {
+      if (outFileName == null) {
+        // make sure system.out uses encoding utf-8
+        outps = new PrintStream(new FileOutputStream(FileDescriptor.out), true, "UTF-8");
+      } else {
+        outps = new PrintStream(outFileName, "UTF-8");
+      }
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException("Could not open output stream", e);
+    } catch (FileNotFoundException e) {
+      throw new RuntimeException("Could not open output stream", e);
+    }
     
-    Writer ow = null; 
     
     String sparqlQuery = "";
     try {
@@ -293,9 +312,13 @@ public class SparqlEndpoint {
     sq.setPrintHeaders(printHeaders);
     sq.setErrorOnInvalidStrings(errorOnInvalidStrings);
     
+    MyResultHandler handler = new MyResultHandler();
+    handler.setOuput(outps);
+    handler.setErrorOnInvalidStrings(errorOnInvalidStrings);
+    handler.setPrintHeaders(printHeaders);
+        
     if(cmd.getOptionValue('b') == null) {
-      ow = setOutput(outFileName);
-      long rows = sq.runTupleQuery(sparqlQuery,ow);
+      long rows = sq.runTupleQuery(sparqlQuery, handler);
       System.err.println("Rows retrieved: "+rows);
     } else {
       // we have got a batchsize parameter
@@ -304,45 +327,38 @@ public class SparqlEndpoint {
       int start = 0;
       long totalRows = 0;
       int i = 0;
+      long lastRows = 0;
       while(true) {   
-        if(outFileName != null) {
-          ow = setOutput(outFileName+".b"+i);
-        }
         String batchQuery = sparqlQuery + " OFFSET "+start+" LIMIT "+batchSize;
-        long rows = sq.runTupleQuery(batchQuery, ow);
-        totalRows += rows;
-        if(rows < batchSize) {
+        long rows = sq.runTupleQuery(batchQuery, handler);
+        if(rows-lastRows < batchSize) {
+          totalRows = rows;
           break;
+        } else {
+          lastRows = rows;
         }
         i++;
         start = start+batchSize;
       }
       System.err.println("Total number of rows: "+totalRows);
-      System.err.println("BatchesL: "+i);
+      System.err.println("Batches: "+i);
     }
+    try {
+      outps.close();
+    } catch (Exception ex) {
+      
+    }
+
   }
   
-  public long runTupleQuery(String sparqlQuery, Writer ow) {
+  public long runTupleQuery(String sparqlQuery, MyResultHandler handler) {
     TupleQuery query = this.createSesameTupleQuery(sparqlQuery);
     System.err.println("Tuple query created: "+query.getClass());
-    MyResultHandler handler = new MyResultHandler();
-    handler.setOuput(ow);
-    handler.setErrorOnInvalidStrings(errorOnInvalidStrings);
-    handler.setPrintHeaders(printHeaders);
     try {
       query.evaluate(handler);
-    } catch (Exception e) {
+    } catch (QueryEvaluationException | TupleQueryResultHandlerException e) {
       throw new RuntimeException("Could not evaluate query",e);
-    } finally {
-      this.close();
-      if(ow != null) {
-        try {
-          ow.close();
-        } catch (Exception e) {          
-        }
-      }
-    }
-    //this.close();
+    } 
     return handler.getRows();
   }
   
@@ -374,11 +390,11 @@ public class SparqlEndpoint {
       // nothing needed here      
     }
 
-    public void setOuput(Writer ow) {
-      this.ow = ow;
+    public void setOuput(PrintStream outps) {
+      this.outps = outps;
     }
     
-    Writer ow = null;
+    PrintStream outps = null;
     
     protected boolean errorOnInvalidStrings = true;
     public void setErrorOnInvalidStrings(boolean v) {
@@ -388,14 +404,18 @@ public class SparqlEndpoint {
     public void setPrintHeaders(boolean v) {
       printHeaders = v;
     }
-   
+    
+    private boolean headersWritten = false;
+  
+   /* 
     @Override
     public void handleLinks(List<String> linkUrls) throws QueryResultHandlerException {
     }
 
     @Override 
     public void handleBoolean(boolean value) throws QueryResultHandlerException {
-    } 
+    }
+   */ 
     
     @Override
     public void handleSolution(BindingSet bs)
@@ -432,16 +452,7 @@ public class SparqlEndpoint {
         }
       }
       buf.append("\n");
-      if(ow == null) {
-        System.out.print(buf);
-      } else {
-        try {
-          ow.write(buf.toString());
-        } catch (IOException e) {
-          e.printStackTrace();
-          throw new RuntimeException("Error writing output", e);
-        }
-      }
+      outps.print(buf);
       rows++;
     }    
 
@@ -449,17 +460,18 @@ public class SparqlEndpoint {
     public void startQueryResult(List<String> arg0)
         throws TupleQueryResultHandlerException {
       bindingNames = arg0;
-      if(printHeaders) {
+      if(printHeaders && !headersWritten) {
+        headersWritten = true;
         boolean first = true;
         for(String name : arg0) {
           if(first) {
             first = false;
           } else {
-            System.out.print("\t");
+            outps.print("\t");
           }
-          System.out.print(name);
+          outps.print(name);
         }
-        System.out.println();
+        outps.println();
       }
     }
     
