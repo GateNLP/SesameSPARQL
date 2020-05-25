@@ -206,11 +206,11 @@ public class SparqlEndpoint {
     
     Options options = new Options();
     options.addOption("h", false, "Show help information");
-    options.addOption("e", true, "what to do:  , default is 'query'");
-    options.addOption("i", true, "infile");
-    options.addOption("o", true, "outfile");
-    options.addOption("b", true, "batchsize for queries");
-    options.addOption("u", true, "endpoint URL");
+    //options.addOption("e", true, "What to do: one of 'query', 'ask', 'update', default is 'query'");
+    options.addOption("i", true, "Query input file (required)");
+    options.addOption("o", true, "Outfile");
+    options.addOption("b", true, "Batchsize for queries, default: retrieve all at once");
+    options.addOption("u", true, "endpoint URL (required)");
     options.addOption("ii", true, "include inferred: true or false, default=true");
     options.addOption("mt", true, "maximum query time in seconds, default=3600");
     options.addOption("ph", true, "print headers: true or false, default=false");
@@ -227,7 +227,7 @@ public class SparqlEndpoint {
     }
     if(cmd.hasOption('h')) {
       HelpFormatter helpFormatter = new HelpFormatter();
-      helpFormatter.printHelp("gcp-direct.sh [options]", options);
+      helpFormatter.printHelp("./bin/query.sh [options]", options);
       System.exit(0);
     }
     

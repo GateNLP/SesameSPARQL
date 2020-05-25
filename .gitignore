@@ -1,6 +1,8 @@
 # if some build artefacts should get ignored, specify the full names here
 # pluginname.jar
 # pluginname.zip
+#
+/target
 
 # temporary files and backup files
 *~
