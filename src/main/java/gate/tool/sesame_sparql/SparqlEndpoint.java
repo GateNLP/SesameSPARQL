@@ -454,6 +454,9 @@ public class SparqlEndpoint {
       buf.append("\n");
       outps.print(buf);
       rows++;
+      if(rows % 1000 == 0) {
+        System.err.println("Rows written: "+rows);
+      }
     }    
 
     @Override
