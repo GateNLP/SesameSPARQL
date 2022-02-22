@@ -50,7 +50,7 @@ while(<STDIN>) {
       exit(1);
     }
     print $values[$entrycolnr];
-    for(my $i = 0; $i < (scalar @values); $i++) {
+    for(my $i = 1; $i < (scalar @values); $i++) {
       print "\t",$colnames[$i],"=",$values[$i];
     }
     print "\n";
